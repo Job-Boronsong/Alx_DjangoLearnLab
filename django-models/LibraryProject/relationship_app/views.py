@@ -6,6 +6,9 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from .forms import RegisterForm
 from django.contrib import messages
+from django.contrib.auth import login
+from django.contrib.auth.forms import UserCreationForm
+
 
 def user_login(request):
     if request.method == 'POST':
@@ -26,6 +29,17 @@ def user_register(request):
             return redirect('login')
     else:
         form = RegisterForm()
+    return render(request, 'relationship_app/register.html', {'form': form})
+
+def register_view(request):
+    if request.method == "POST":
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)  # Auto-login after successful registration
+            return redirect('home')  # Change 'home' to your desired URL name
+    else:
+        form = UserCreationForm()
     return render(request, 'relationship_app/register.html', {'form': form})
 
 def user_logout(request):
