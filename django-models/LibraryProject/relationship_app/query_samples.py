@@ -1,11 +1,12 @@
 import os
 import django
+from relationship_app.models import Author, Book, Library, Librarian
 
 # Setup Django environment (only needed if running as standalone script)
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'LibraryProject.settings')  # Replace with your actual project name
 django.setup()
 
-from relationship_app.models import Author, Book, Library, Librarian
+
 
 # 1. Query all books by a specific author
 def get_books_by_author(author_name):
