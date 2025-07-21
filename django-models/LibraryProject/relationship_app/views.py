@@ -13,6 +13,8 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponseForbidden
 from .models import Book
 from .forms import BookForm
+from django.contrib.auth.decorators import permission_required
+
 
 def is_superuser(user):
     return user.is_superuser
