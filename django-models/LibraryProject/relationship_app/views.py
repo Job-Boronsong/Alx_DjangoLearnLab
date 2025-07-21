@@ -9,6 +9,10 @@ from .forms import RegisterForm
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 from .models import UserProfile
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponseForbidden
+from .models import Book
+from .forms import BookForm
 
 def is_superuser(user):
     return user.is_superuser
@@ -83,3 +87,35 @@ def librarian_view(request):
 @check_role('Member')
 def member_view(request):
     return render(request, 'relationship_app/member_view.html')
+
+@login_required
+@permission_required('relationship_app.can_add_book', raise_exception=True)
+def add_book(request):
+    if request.method == "POST":
+        form = BookForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('list_books')
+    else:
+        form = BookForm()
+    return render(request, 'relationship_app/add_book.html', {'form': form})
+
+@login_required
+@permission_required('relationship_app.can_change_book', raise_exception=True)
+def edit_book(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    form = BookForm(request.POST or None, instance=book)
+    if form.is_valid():
+        form.save()
+        return redirect('list_books')
+    return render(request, 'relationship_app/edit_book.html', {'form': form, 'book': book})
+
+@login_required
+@permission_required('relationship_app.can_delete_book', raise_exception=True)
+def delete_book(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    if request.method == "POST":
+        book.delete()
+        return redirect('list_books')
+    return render(request, 'relationship_app/delete_book.html', {'book': book})
+
