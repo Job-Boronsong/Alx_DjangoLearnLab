@@ -8,6 +8,8 @@ from .forms import RegisterForm
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.decorators import login_required, user_passes_test
+from .models import UserProfile
 
 
 def user_login(request):
@@ -57,3 +59,23 @@ class LibraryDetailView(DetailView):
     model = Library
     template_name = 'relationship_app/library_detail.html'
     context_object_name = 'library'
+
+def check_role(role):
+    def inner(user):
+        return hasattr(user, 'userprofile') and user.userprofile.role == role
+    return user_passes_test(inner)
+
+@login_required
+@check_role('Admin')
+def admin_view(request):
+    return render(request, 'relationship_app/admin_view.html')
+
+@login_required
+@check_role('Librarian')
+def librarian_view(request):
+    return render(request, 'relationship_app/librarian_view.html')
+
+@login_required
+@check_role('Member')
+def member_view(request):
+    return render(request, 'relationship_app/member_view.html')
