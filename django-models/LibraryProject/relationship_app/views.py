@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render, redirect
 from .models import Book
 from django.views.generic.detail import DetailView
@@ -6,11 +7,15 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from .forms import RegisterForm
 from django.contrib import messages
-from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import UserProfile
 
+def is_superuser(user):
+    return user.is_superuser
+
+@user_passes_test(is_superuser)
+def superuser_dashboard(request):
+    return render(request, 'relationship_app/superuser_dashboard.html')
 
 def user_login(request):
     if request.method == 'POST':
@@ -52,7 +57,6 @@ def user_logout(request):
 def list_books(request):
     books = Book.objects.all()
     return render(request, 'relationship_app/list_books.html', {'books': books})
-
 
 # Class-based view
 class LibraryDetailView(DetailView):
