@@ -1,22 +1,17 @@
 from django.contrib import admin
-from .models import Book
+from .models import Book, CustomUser
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser
 from django.utils.translation import gettext_lazy as _
 
-# Register the Book model
-# admin.site.register(Book)
-
-
+# Book Admin Configuration
 class BookAdmin(admin.ModelAdmin):
-    list_display = ('title', 'author', 'publication_year')  # Columns shown in the list view
-    search_fields = ('title', 'author')                     # Enables search bar for these fields
-    list_filter = ('publication_year',)                     # Adds a filter sidebar for year
+    list_display = ('title', 'author', 'publication_year')
+    search_fields = ('title', 'author')
+    list_filter = ('publication_year',)
 
-# Register with the custom configuration
 admin.site.register(Book, BookAdmin)
 
-
+# Custom User Admin Configuration
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
     list_display = ['username', 'email', 'date_of_birth', 'is_staff']
