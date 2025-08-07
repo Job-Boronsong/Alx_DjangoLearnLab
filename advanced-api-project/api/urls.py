@@ -2,6 +2,15 @@ from rest_framework import generics, permissions, filters
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Book
 from .serializers import BookSerializer
+from django.urls import path
+from .views import BookListCreateView, BookRetrieveUpdateDestroyView
+
+urlpatterns = [
+    path('books/', BookListCreateView.as_view(), name='book-list-create'),
+    path('books/<int:pk>/', BookRetrieveUpdateDestroyView.as_view(), name='book-detail'),
+]
+
+
 
 
 # List view with filters, search, ordering

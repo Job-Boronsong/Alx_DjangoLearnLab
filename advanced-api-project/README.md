@@ -27,3 +27,25 @@ POST /api-token-auth/
   "username": "youruser",
   "password": "yourpass"
 }
+
+
+"""
+Testing Strategy:
+-----------------
+- Tests focus on CRUD operations of the Book model via API.
+- Checks for correct response codes, data, authentication/authorization.
+- Tests use Django REST Framework's APITestCase with an isolated test DB.
+
+How to Run:
+-----------
+$ python manage.py test api
+
+Test Coverage:
+--------------
+- List books
+- Create book (auth vs no-auth)
+- Retrieve book
+- Update book
+- Delete book
+- Search, filter, order
+"""
