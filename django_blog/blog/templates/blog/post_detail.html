@@ -18,4 +18,33 @@
 
   <p><a href="{% url 'posts-list' %}">← Back to all posts</a></p>
 </article>
+
+<h2>Comments</h2>
+
+{% for comment in post.comments.all %}
+    <div>
+        <p><strong>{{ comment.author.username }}</strong> - {{ comment.created_at|date:"M d, Y H:i" }}</p>
+        <p>{{ comment.content }}</p>
+        {% if comment.author == user %}
+            <a href="{% url 'comment-update' comment.pk %}">Edit</a>
+            <a href="{% url 'comment-delete' comment.pk %}">Delete</a>
+        {% endif %}
+    </div>
+{% empty %}
+    <p>No comments yet.</p>
+{% endfor %}
+
+{% if user.is_authenticated %}
+    <h3>Leave a comment</h3>
+    <form method="post" action="{% url 'comment-create' post.pk %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Post Comment</button>
+    </form>
+{% else %}
+    <p><a href="{% url 'login' %}">Login</a> to comment.</p>
+{% endif %}
+
+
+
 {% endblock %}
