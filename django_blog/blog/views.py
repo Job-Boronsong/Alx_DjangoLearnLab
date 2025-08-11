@@ -12,7 +12,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Post, Comment
 from .forms import CommentForm
 from django.urls import reverse
-
+from django.db.models import Q
 from .models import Post
 
 
@@ -160,3 +160,22 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         post = self.get_object()
         return self.request.user == post.author
+
+
+def search_view(request):
+    query = request.GET.get('q', '')
+    posts = Post.objects.all()
+
+    if query:
+        posts = posts.filter(
+            Q(title__icontains=query) |
+            Q(content__icontains=query) |
+            Q(tags__name__icontains=query)
+        ).distinct()
+
+    return render(request, 'blog/search_results.html', {'posts': posts, 'query': query})
+
+# blog/views.py
+def tag_view(request, tag_name):
+    posts = Post.objects.filter(tags__name__iexact=tag_name)
+    return render(request, 'blog/tag_posts.html', {'posts': posts, 'tag': tag_name})

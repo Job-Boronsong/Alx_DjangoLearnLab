@@ -1,6 +1,7 @@
 # blog/forms.py
 from django import forms
-from .models import Post, Comment  # Make sure Comment exists in models.py
+from .models import Post, Comment  
+from taggit.forms import TagWidget
 
 class PostForm(forms.ModelForm):
     class Meta:
@@ -9,6 +10,7 @@ class PostForm(forms.ModelForm):
         widgets = {
             'title': forms.TextInput(attrs={'placeholder': 'Post title'}),
             'content': forms.Textarea(attrs={'rows': 10, 'placeholder': 'Write your post here...'}),
+            'tags': TagWidget(),
         }
 
 class CommentForm(forms.ModelForm):
