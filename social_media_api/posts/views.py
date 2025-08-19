@@ -1,7 +1,15 @@
 from rest_framework import viewsets, permissions
 from .models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.decorators import action
+from django.contrib.auth import get_user_model
 
+
+
+User = get_user_model()
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
     """
@@ -16,12 +24,17 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
 
 
 class PostViewSet(viewsets.ModelViewSet):
-    queryset = Post.objects.all()  # ✅ this makes the check pass
+    queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+    @action(detail=False, methods=['get'])
+    def feed(self, request):
+        """Feed: posts from followed users"""
+        followed_users = request.user.following.all()
+        posts = Post.objects.filter(author__in=followed_users).order_by('-created_at')
+        serializer = PostSerializer(posts, many=True)
+        return Response(serializer.data)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
