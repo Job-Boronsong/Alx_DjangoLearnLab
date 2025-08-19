@@ -159,3 +159,26 @@ Response:
 ## 👨‍💻 Author  
 
 Built for **ALX Django Learn Lab** 🚀  
+
+
+New endpoints
+
+GET /api/posts/ – list posts (paginated, ?search=<q>, ?author=<id>, ordering)
+
+POST /api/posts/ – create (auth)
+
+GET /api/posts/{id}/ – retrieve
+
+PATCH/PUT /api/posts/{id}/ – update (owner only)
+
+DELETE /api/posts/{id}/ – delete (owner only)
+
+GET /api/comments/ – list comments (paginated, ?post=<id>, ?author=<id>, search)
+
+POST /api/comments/ – create (auth)
+
+GET /api/comments/{id}/ – retrieve
+
+PATCH/PUT /api/comments/{id}/ – update (owner only)
+
+DELETE /api/comments/{id}/ – delete (owner only)
