@@ -182,3 +182,12 @@ GET /api/comments/{id}/ – retrieve
 PATCH/PUT /api/comments/{id}/ – update (owner only)
 
 DELETE /api/comments/{id}/ – delete (owner only)
+
+### 🔗 Follow & Feed API
+
+#### Follow a User
+- Endpoint: `POST /users/{id}/follow/`
+- Auth required: ✅
+- Response:
+```json
+{ "message": "You are now following username" }
