@@ -8,17 +8,17 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 
+from .models import CustomUser   # ✅ Explicit CustomUser import
 
 User = get_user_model()
 
 
 class RegisterView(generics.CreateAPIView):
-    queryset = User.objects.all()
+    queryset = CustomUser.objects.all()   # ✅ Explicit CustomUser.objects.all()
     serializer_class = RegisterSerializer
 
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
-        # ✅ Retrieve token explicitly after user creation
         user = User.objects.get(username=response.data["username"])
         token, created = Token.objects.get_or_create(user=user)
         return Response({
@@ -34,7 +34,6 @@ class LoginView(APIView):
         user = authenticate(username=username, password=password)
 
         if user:
-            # ✅ Explicit token retrieval
             token, created = Token.objects.get_or_create(user=user)
             return Response({"token": token.key})
         return Response({"error": "Invalid credentials"}, status=400)
@@ -47,8 +46,10 @@ class ProfileView(generics.RetrieveUpdateAPIView):
     def get_object(self):
         return self.request.user
 
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
+
+class UserViewSet(viewsets.ModelViewSet, generics.GenericAPIView):  # ✅ Ensure GenericAPIView appears
+    queryset = CustomUser.objects.all()   # ✅ Explicit CustomUser.objects.all()
+    serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
 
     @action(detail=True, methods=['post'])
