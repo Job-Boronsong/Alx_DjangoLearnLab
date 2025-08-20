@@ -1,9 +1,12 @@
-from rest_framework import viewsets, permissions
-from rest_framework.decorators import action
+from rest_framework import viewsets, permissions, status
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
-from .models import Post, Comment
+from .models import Post, Comment,Like
 from .serializers import PostSerializer, CommentSerializer
+from notifications.utils import create_notification
+from rest_framework.permissions import IsAuthenticated
+
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -50,3 +53,43 @@ class CommentViewSet(viewsets.ModelViewSet):
         if instance.author != self.request.user:
             raise PermissionDenied("You can only delete your own comments.")
         instance.delete()
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def like_post(request, pk):
+    try:
+        post = Post.objects.get(pk=pk)
+    except Post.DoesNotExist:
+        return Response({"error": "Post not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    like, created = Like.objects.get_or_create(post=post, user=request.user)
+    if not created:
+        return Response({"error": "Already liked"}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Send notification to post author
+    if post.author != request.user:
+        create_notification(
+            recipient=post.author,
+            actor=request.user,
+            verb="liked your post",
+            target=post
+        )
+
+    return Response({"message": "Post liked"}, status=status.HTTP_201_CREATED)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def unlike_post(request, pk):
+    try:
+        post = Post.objects.get(pk=pk)
+    except Post.DoesNotExist:
+        return Response({"error": "Post not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    try:
+        like = Like.objects.get(post=post, user=request.user)
+        like.delete()
+        return Response({"message": "Post unliked"}, status=status.HTTP_200_OK)
+    except Like.DoesNotExist:
+        return Response({"error": "You haven’t liked this post"}, status=status.HTTP_400_BAD_REQUEST)
