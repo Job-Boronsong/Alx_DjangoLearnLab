@@ -1,0 +1,1 @@
+DJANGO_SECRET_KEY=01z!zpisuf_ilqu&5nbjf69*t@@iyziea77!f0&vz$z4%50o+x
